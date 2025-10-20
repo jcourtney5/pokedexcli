@@ -1,29 +1,29 @@
-    # our main executable
-    .pokedexcli
-    .test.txt
+# our main executable
+pokedexcli
+test.txt
 
-    # Binaries for programs and plugins
-    *.exe
-    *.dll
-    *.so
-    *.dylib
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
 
-    # Test binaries
-    *.test
+# Test binaries
+*.test
 
-    # Output of go build
-    *.out
+# Output of go build
+*.out
 
-    # Dependency directories (Go modules)
-    /vendor/
+# Dependency directories (Go modules)
+/vendor/
 
-    # Go modules cache
-    /pkg/mod/
+# Go modules cache
+/pkg/mod/
 
-    # Editor/IDE specific files (examples)
-    .vscode/
-    .idea/
-    *.swp
+# Editor/IDE specific files (examples)
+.vscode/
+.idea/
+*.swp
 
-    # Log files
-    *.log
+# Log files
+*.log
