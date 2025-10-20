@@ -1,0 +1,25 @@
+    # Binaries for programs and plugins
+    *.exe
+    *.dll
+    *.so
+    *.dylib
+
+    # Test binaries
+    *.test
+
+    # Output of go build
+    *.out
+
+    # Dependency directories (Go modules)
+    /vendor/
+
+    # Go modules cache
+    /pkg/mod/
+
+    # Editor/IDE specific files (examples)
+    .vscode/
+    .idea/
+    *.swp
+
+    # Log files
+    *.log
