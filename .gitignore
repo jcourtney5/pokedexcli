@@ -1,3 +1,7 @@
+    # our main executable
+    .pokedexcli
+    .test.txt
+
     # Binaries for programs and plugins
     *.exe
     *.dll
