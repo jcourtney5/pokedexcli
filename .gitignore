@@ -1,6 +1,6 @@
 # our main executable
 pokedexcli
-test.txt
+repl.log
 
 # Binaries for programs and plugins
 *.exe
