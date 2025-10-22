@@ -19,7 +19,20 @@ func main() {
 		input := scanner.Text()
 		words := cleanInput(input)
 		if len(words) > 0 {
-			fmt.Println("Your command was:", words[0])
+			command := words[0]
+			cliCommand, ok := getCommand(command)
+			if ok {
+				err := cliCommand.callback()
+				if err != nil {
+					fmt.Printf(
+						"Command: %s failed with error: %w\n",
+						command,
+						err,
+					)
+				}
+			} else {
+				fmt.Printf("Unknown command: %s\n", command)
+			}
 		}
 	}
 
