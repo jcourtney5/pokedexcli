@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/jcourtney5/pokedexcli/internal/api"
+	"github.com/jcourtney5/pokedexcli/internal/pokeapi"
+	"github.com/jcourtney5/pokedexcli/internal/pokecache"
 	"os"
 )
 
@@ -15,6 +16,7 @@ type cliCommand struct {
 type config struct {
 	next     string
 	previous string
+	cache    *pokecache.Cache
 }
 
 var commands = map[string]cliCommand{
@@ -53,7 +55,8 @@ func commandExit(conf *config) error {
 
 func commandHelp(conf *config) error {
 	fmt.Println("Welcome to the Pokedex!")
-	fmt.Println("Usage:\n")
+	fmt.Println("Usage:")
+	fmt.Println("")
 	fmt.Println("help: Displays a help message")
 	fmt.Println("exit: Exit the Pokedex")
 	fmt.Println("map: Displays the names of next 20 location areas in the Pokemon world")
@@ -68,9 +71,9 @@ func commandMap(conf *config) error {
 	}
 
 	// call the poke API with next
-	res, err := api.PokeLocationAreaGet(url)
+	res, err := pokeapi.PokeLocationAreaGet(url, conf.cache)
 	if err != nil {
-		return fmt.Errorf("Error calling poke api %s, failed with error : %w\n", conf.next, err)
+		return fmt.Errorf("Error calling poke pokeapi %s, failed with error : %w\n", conf.next, err)
 	}
 
 	// print the results
@@ -99,9 +102,9 @@ func commandMapB(conf *config) error {
 		return nil
 	} else {
 		// call the poke API with previous
-		res, err := api.PokeLocationAreaGet(conf.previous)
+		res, err := pokeapi.PokeLocationAreaGet(conf.previous, conf.cache)
 		if err != nil {
-			return fmt.Errorf("Error calling poke api %s, failed with error : %w\n", conf.next, err)
+			return fmt.Errorf("Error calling poke pokeapi %s, failed with error : %w\n", conf.next, err)
 		}
 
 		// print the results

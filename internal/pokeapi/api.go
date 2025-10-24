@@ -1,8 +1,9 @@
-package api
+package pokeapi
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/jcourtney5/pokedexcli/internal/pokecache"
 	"io"
 	"net/http"
 )
@@ -17,8 +18,21 @@ type LocationAreaResult struct {
 	} `json:"results"`
 }
 
-func PokeLocationAreaGet(url string) (LocationAreaResult, error) {
+func PokeLocationAreaGet(url string, cache *pokecache.Cache) (LocationAreaResult, error) {
 	var locationAreaResult LocationAreaResult
+
+	// check the cache first
+	cacheData, ok := cache.Get(url)
+	if ok {
+		fmt.Printf("Cache hit: %s\n", url)
+
+		// Unmarshal the JSON into the struct
+		err := json.Unmarshal(cacheData, &locationAreaResult)
+		if err != nil {
+			fmt.Println("Error unmarshalling JSON:", err)
+			return locationAreaResult, err
+		}
+	}
 
 	// Call the pokemon location-area API with a get request
 	res, err := http.Get(url)
@@ -41,12 +55,15 @@ func PokeLocationAreaGet(url string) (LocationAreaResult, error) {
 		return locationAreaResult, err
 	}
 
+	// Add to the cache after a read
+	cache.Add(url, body)
+
 	// Unmarshal the JSON into the struct
 	err = json.Unmarshal(body, &locationAreaResult)
 	if err != nil {
 		fmt.Println("Error unmarshalling JSON:", err)
 		return locationAreaResult, err
 	}
-	
+
 	return locationAreaResult, nil
 }

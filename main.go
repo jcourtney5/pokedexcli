@@ -3,7 +3,9 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/jcourtney5/pokedexcli/internal/pokecache"
 	"os"
+	"time"
 )
 
 func main() {
@@ -12,6 +14,7 @@ func main() {
 	conf := config{
 		next:     "https://pokeapi.co/api/v2/location-area",
 		previous: "",
+		cache:    pokecache.NewCache(15 * time.Second),
 	}
 
 	for {
@@ -30,7 +33,7 @@ func main() {
 				err := cliCommand.callback(&conf)
 				if err != nil {
 					fmt.Printf(
-						"Command: %s failed with error: %w\n",
+						"Command: %s failed with error: %v\n",
 						command,
 						err,
 					)
