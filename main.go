@@ -28,9 +28,15 @@ func main() {
 		words := cleanInput(input)
 		if len(words) > 0 {
 			command := words[0]
+
+			var areaName string
+			if len(words) > 1 {
+				areaName = words[1]
+			}
+
 			cliCommand, ok := getCommand(command)
 			if ok {
-				err := cliCommand.callback(&conf)
+				err := cliCommand.callback(&conf, areaName)
 				if err != nil {
 					fmt.Printf(
 						"Command: %s failed with error: %v\n",

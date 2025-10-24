@@ -10,7 +10,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(conf *config) error
+	callback    func(conf *config, areaName string) error
 }
 
 type config struct {
@@ -40,6 +40,11 @@ var commands = map[string]cliCommand{
 		description: "Displays the names of previous 20 location areas in the Pokemon world",
 		callback:    commandMapB,
 	},
+	"explore": {
+		name:        "explore",
+		description: "Find a list of all pokemon at the given location area name",
+		callback:    commandExplore,
+	},
 }
 
 func getCommand(name string) (cliCommand, bool) {
@@ -47,13 +52,13 @@ func getCommand(name string) (cliCommand, bool) {
 	return value, ok
 }
 
-func commandExit(conf *config) error {
+func commandExit(conf *config, areaName string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandHelp(conf *config) error {
+func commandHelp(conf *config, areaName string) error {
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println("")
@@ -61,17 +66,18 @@ func commandHelp(conf *config) error {
 	fmt.Println("exit: Exit the Pokedex")
 	fmt.Println("map: Displays the names of next 20 location areas in the Pokemon world")
 	fmt.Println("mapb: Displays the names of previous 20 location areas in the Pokemon world")
+	fmt.Println("explore <area_name>: Find a list of all pokemon at the given location area name")
 	return nil
 }
 
-func commandMap(conf *config) error {
+func commandMap(conf *config, areaName string) error {
 	url := conf.next
 	if len(conf.next) == 0 {
 		url = "https://pokeapi.co/api/v2/location-area"
 	}
 
 	// call the poke API with next
-	res, err := pokeapi.PokeLocationAreaGet(url, conf.cache)
+	res, err := pokeapi.PokeLocationAreasGet(url, conf.cache)
 	if err != nil {
 		return fmt.Errorf("Error calling poke pokeapi %s, failed with error : %w\n", conf.next, err)
 	}
@@ -96,13 +102,13 @@ func commandMap(conf *config) error {
 	return nil
 }
 
-func commandMapB(conf *config) error {
+func commandMapB(conf *config, areaName string) error {
 	if len(conf.previous) == 0 {
 		fmt.Println("you're on the first page")
 		return nil
 	} else {
 		// call the poke API with previous
-		res, err := pokeapi.PokeLocationAreaGet(conf.previous, conf.cache)
+		res, err := pokeapi.PokeLocationAreasGet(conf.previous, conf.cache)
 		if err != nil {
 			return fmt.Errorf("Error calling poke pokeapi %s, failed with error : %w\n", conf.next, err)
 		}
@@ -124,5 +130,23 @@ func commandMapB(conf *config) error {
 			conf.next = ""
 		}
 	}
+	return nil
+}
+
+func commandExplore(conf *config, areaName string) error {
+	fmt.Printf("Exploring %s...\n", areaName)
+
+	// call the poke API with previous
+	res, err := pokeapi.PokeLocationAreaGet(areaName, conf.cache)
+	if err != nil {
+		return fmt.Errorf("Error calling pokeapi.PokeLocationAreaGet, failed with error : %w\n", err)
+	}
+
+	// print the results
+	fmt.Println("Found Pokemon:")
+	for i := 0; i < len(res.PokemonEncounters); i++ {
+		fmt.Printf(" - %s\n", res.PokemonEncounters[i].Pokemon.Name)
+	}
+
 	return nil
 }
