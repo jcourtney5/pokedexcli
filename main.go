@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/jcourtney5/pokedexcli/internal/pokeapi"
 	"github.com/jcourtney5/pokedexcli/internal/pokecache"
 	"os"
 	"time"
@@ -15,6 +16,7 @@ func main() {
 		next:     "https://pokeapi.co/api/v2/location-area",
 		previous: "",
 		cache:    pokecache.NewCache(15 * time.Second),
+		pokedex:  make(map[string]pokeapi.Pokemon),
 	}
 
 	for {
@@ -29,14 +31,14 @@ func main() {
 		if len(words) > 0 {
 			command := words[0]
 
-			var areaName string
+			var arg1 string
 			if len(words) > 1 {
-				areaName = words[1]
+				arg1 = words[1]
 			}
 
 			cliCommand, ok := getCommand(command)
 			if ok {
-				err := cliCommand.callback(&conf, areaName)
+				err := cliCommand.callback(&conf, arg1)
 				if err != nil {
 					fmt.Printf(
 						"Command: %s failed with error: %v\n",

@@ -9,71 +9,8 @@ import (
 	"github.com/jcourtney5/pokedexcli/internal/pokecache"
 )
 
-type LocationAreasResult struct {
-	Count    int     `json:"count"`
-	Next     *string `json:"next"`
-	Previous *string `json:"previous"`
-	Results  []struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"results"`
-}
-
-type LocationAreaResult struct {
-	EncounterMethodRates []struct {
-		EncounterMethod struct {
-			Name string `json:"name"`
-			URL  string `json:"url"`
-		} `json:"encounter_method"`
-		VersionDetails []struct {
-			Rate    int `json:"rate"`
-			Version struct {
-				Name string `json:"name"`
-				URL  string `json:"url"`
-			} `json:"version"`
-		} `json:"version_details"`
-	} `json:"encounter_method_rates"`
-	GameIndex int `json:"game_index"`
-	ID        int `json:"id"`
-	Location  struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"location"`
-	Name  string `json:"name"`
-	Names []struct {
-		Language struct {
-			Name string `json:"name"`
-			URL  string `json:"url"`
-		} `json:"language"`
-		Name string `json:"name"`
-	} `json:"names"`
-	PokemonEncounters []struct {
-		Pokemon struct {
-			Name string `json:"name"`
-			URL  string `json:"url"`
-		} `json:"pokemon"`
-		VersionDetails []struct {
-			EncounterDetails []struct {
-				Chance          int           `json:"chance"`
-				ConditionValues []interface{} `json:"condition_values"`
-				MaxLevel        int           `json:"max_level"`
-				Method          struct {
-					Name string `json:"name"`
-					URL  string `json:"url"`
-				} `json:"method"`
-				MinLevel int `json:"min_level"`
-			} `json:"encounter_details"`
-			MaxChance int `json:"max_chance"`
-			Version   struct {
-				Name string `json:"name"`
-				URL  string `json:"url"`
-			} `json:"version"`
-		} `json:"version_details"`
-	} `json:"pokemon_encounters"`
-}
-
-func PokeLocationAreasGet(url string, cache *pokecache.Cache) (LocationAreasResult, error) {
-	var locationAreasResult LocationAreasResult
+func GetLocationAreas(url string, cache *pokecache.Cache) (LocationAreas, error) {
+	var locationAreas LocationAreas
 
 	// check the cache first
 	cacheData, ok := cache.Get(url)
@@ -81,10 +18,10 @@ func PokeLocationAreasGet(url string, cache *pokecache.Cache) (LocationAreasResu
 		fmt.Printf("Cache hit: %s\n", url)
 
 		// Unmarshal the JSON into the struct
-		err := json.Unmarshal(cacheData, &locationAreasResult)
+		err := json.Unmarshal(cacheData, &locationAreas)
 		if err != nil {
 			fmt.Println("Error unmarshalling JSON:", err)
-			return locationAreasResult, err
+			return locationAreas, err
 		}
 	}
 
@@ -92,40 +29,40 @@ func PokeLocationAreasGet(url string, cache *pokecache.Cache) (LocationAreasResu
 	res, err := http.Get(url)
 	if err != nil {
 		fmt.Println("Error making GET request:", err)
-		return locationAreasResult, err
+		return locationAreas, err
 	}
 	defer res.Body.Close()
 
 	// Check for a successful status code
 	if res.StatusCode != http.StatusOK {
 		err := fmt.Errorf("Response failed with status code: %d\n", res.StatusCode)
-		return locationAreasResult, err
+		return locationAreas, err
 	}
 
 	// Read the response body
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		fmt.Println("Error reading response body:", err)
-		return locationAreasResult, err
+		return locationAreas, err
 	}
 
 	// Add to the cache after a read
 	cache.Add(url, body)
 
 	// Unmarshal the JSON into the struct
-	err = json.Unmarshal(body, &locationAreasResult)
+	err = json.Unmarshal(body, &locationAreas)
 	if err != nil {
 		fmt.Println("Error unmarshalling JSON:", err)
-		return locationAreasResult, err
+		return locationAreas, err
 	}
 
-	return locationAreasResult, nil
+	return locationAreas, nil
 }
 
-func PokeLocationAreaGet(areaName string, cache *pokecache.Cache) (LocationAreaResult, error) {
+func GetLocationArea(areaName string, cache *pokecache.Cache) (LocationArea, error) {
 	url := "https://pokeapi.co/api/v2/location-area/" + areaName
 
-	var locationAreaResult LocationAreaResult
+	var locationArea LocationArea
 
 	// check the cache first
 	cacheData, ok := cache.Get(url)
@@ -133,10 +70,10 @@ func PokeLocationAreaGet(areaName string, cache *pokecache.Cache) (LocationAreaR
 		fmt.Printf("Cache hit: %s\n", url)
 
 		// Unmarshal the JSON into the struct
-		err := json.Unmarshal(cacheData, &locationAreaResult)
+		err := json.Unmarshal(cacheData, &locationArea)
 		if err != nil {
 			fmt.Println("Error unmarshalling JSON:", err)
-			return locationAreaResult, err
+			return locationArea, err
 		}
 	}
 
@@ -144,32 +81,84 @@ func PokeLocationAreaGet(areaName string, cache *pokecache.Cache) (LocationAreaR
 	res, err := http.Get(url)
 	if err != nil {
 		fmt.Println("Error making GET request:", err)
-		return locationAreaResult, err
+		return locationArea, err
 	}
 	defer res.Body.Close()
 
 	// Check for a successful status code
 	if res.StatusCode != http.StatusOK {
 		err := fmt.Errorf("Response failed with status code: %d\n", res.StatusCode)
-		return locationAreaResult, err
+		return locationArea, err
 	}
 
 	// Read the response body
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		fmt.Println("Error reading response body:", err)
-		return locationAreaResult, err
+		return locationArea, err
 	}
 
 	// Add to the cache after a read
 	cache.Add(url, body)
 
 	// Unmarshal the JSON into the struct
-	err = json.Unmarshal(body, &locationAreaResult)
+	err = json.Unmarshal(body, &locationArea)
 	if err != nil {
 		fmt.Println("Error unmarshalling JSON:", err)
-		return locationAreaResult, err
+		return locationArea, err
 	}
 
-	return locationAreaResult, nil
+	return locationArea, nil
+}
+
+func GetPokemon(name string, cache *pokecache.Cache) (Pokemon, error) {
+	url := "https://pokeapi.co/api/v2/pokemon/" + name
+
+	var pokemon Pokemon
+
+	// check the cache first
+	cacheData, ok := cache.Get(url)
+	if ok {
+		fmt.Printf("Cache hit: %s\n", url)
+
+		// Unmarshal the JSON into the struct
+		err := json.Unmarshal(cacheData, &pokemon)
+		if err != nil {
+			fmt.Println("Error unmarshalling JSON:", err)
+			return pokemon, err
+		}
+	}
+
+	// Call the pokemon API with a get request
+	res, err := http.Get(url)
+	if err != nil {
+		fmt.Println("Error making GET request:", err)
+		return pokemon, err
+	}
+	defer res.Body.Close()
+
+	// Check for a successful status code
+	if res.StatusCode != http.StatusOK {
+		err := fmt.Errorf("Response failed with status code: %d\n", res.StatusCode)
+		return pokemon, err
+	}
+
+	// Read the response body
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println("Error reading response body:", err)
+		return pokemon, err
+	}
+
+	// Add to the cache after a read
+	cache.Add(url, body)
+
+	// Unmarshal the JSON into the struct
+	err = json.Unmarshal(body, &pokemon)
+	if err != nil {
+		fmt.Println("Error unmarshalling JSON:", err)
+		return pokemon, err
+	}
+
+	return pokemon, nil
 }
