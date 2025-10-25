@@ -52,6 +52,11 @@ var commands = map[string]cliCommand{
 		description: "Attempt to catch pokemon with the given <pokemon_name>",
 		callback:    commandCatch,
 	},
+	"inspect": {
+		name:        "inspect",
+		description: "Get details about the given <pokemon_name> if it is in your pokedex",
+		callback:    commandInspect,
+	},
 }
 
 func getCommand(name string) (cliCommand, bool) {
@@ -75,6 +80,7 @@ func commandHelp(conf *config, arg1 string) error {
 	fmt.Println("mapb: Displays the names of previous 20 location areas in the Pokemon world")
 	fmt.Println("explore <area_name>: Find a list of all pokemon at the given location <area_name>")
 	fmt.Println("catch <pokemon_name>: Attempt to catch pokemon with the given <pokemon_name>")
+	fmt.Println("inspect <pokemon_name>: Get details about the given <pokemon_name> if it is in your pokedex")
 	return nil
 }
 
@@ -187,6 +193,31 @@ func commandCatch(conf *config, arg1 string) error {
 		}
 	} else {
 		fmt.Printf("%s was not caught!\n", pokemon.Name)
+	}
+
+	return nil
+}
+
+func commandInspect(conf *config, arg1 string) error {
+	pokemon, ok := conf.pokedex[arg1]
+	if !ok {
+		fmt.Printf("%s is not in your pokedex\n", arg1)
+		return nil
+	}
+
+	// Print pokemon info
+	fmt.Printf("Name: %v\n", pokemon.Name)
+	fmt.Printf("Height: %v\n", pokemon.Height)
+	fmt.Printf("Weight: %v\n", pokemon.Weight)
+
+	fmt.Println("Stats:")
+	for _, stats := range pokemon.Stats {
+		fmt.Printf("  - %s: %v\n", stats.Stat.Name, stats.BaseStat)
+	}
+
+	fmt.Println("Types:")
+	for _, types := range pokemon.Types {
+		fmt.Printf("  - %s\n", types.Type.Name)
 	}
 
 	return nil
