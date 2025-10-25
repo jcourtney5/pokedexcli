@@ -1,7 +1,6 @@
 package pokecache
 
 import (
-	"fmt"
 	"sync"
 	"time"
 )
@@ -61,7 +60,7 @@ func (cache *Cache) reapLoop() {
 
 		for key, cacheEntry := range cache.entries {
 			if t.Sub(cacheEntry.createdAt) > cache.interval {
-				fmt.Printf("Deleting cache entry %s\n", key)
+				//fmt.Printf("Deleting cache entry %s\n", key)
 				delete(cache.entries, key)
 			}
 		}

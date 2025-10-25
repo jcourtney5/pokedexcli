@@ -57,6 +57,11 @@ var commands = map[string]cliCommand{
 		description: "Get details about the given <pokemon_name> if it is in your pokedex",
 		callback:    commandInspect,
 	},
+	"pokedex": {
+		name:        "pokedex",
+		description: "List all the pokemon in your Pokedex",
+		callback:    commandPokedex,
+	},
 }
 
 func getCommand(name string) (cliCommand, bool) {
@@ -81,6 +86,7 @@ func commandHelp(conf *config, arg1 string) error {
 	fmt.Println("explore <area_name>: Find a list of all pokemon at the given location <area_name>")
 	fmt.Println("catch <pokemon_name>: Attempt to catch pokemon with the given <pokemon_name>")
 	fmt.Println("inspect <pokemon_name>: Get details about the given <pokemon_name> if it is in your pokedex")
+	fmt.Println("pokedex: List all the pokemon in your Pokedex")
 	return nil
 }
 
@@ -185,12 +191,8 @@ func commandCatch(conf *config, arg1 string) error {
 	// See if we caught the pokemon
 	if rand_num > base_experience {
 		fmt.Printf("%s was caught!\n", pokemon.Name)
+		fmt.Println("You may now inspect it with the inspect command.")
 		conf.pokedex[pokemon.Name] = pokemon
-
-		fmt.Println("Current caught pokemon:")
-		for name, _ := range conf.pokedex {
-			fmt.Printf(" - %s\n", name)
-		}
 	} else {
 		fmt.Printf("%s was not caught!\n", pokemon.Name)
 	}
@@ -218,6 +220,15 @@ func commandInspect(conf *config, arg1 string) error {
 	fmt.Println("Types:")
 	for _, types := range pokemon.Types {
 		fmt.Printf("  - %s\n", types.Type.Name)
+	}
+
+	return nil
+}
+
+func commandPokedex(conf *config, arg1 string) error {
+	fmt.Println("Your Pokedex:")
+	for name, _ := range conf.pokedex {
+		fmt.Printf(" - %s\n", name)
 	}
 
 	return nil
